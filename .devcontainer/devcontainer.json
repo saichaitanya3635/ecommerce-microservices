@@ -12,7 +12,6 @@
       "minikube": "none"
     },
     "ghcr.io/devcontainers/features/terraform:1": {
-      "tflint": "latest"
     },
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
