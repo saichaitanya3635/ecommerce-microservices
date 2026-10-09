@@ -1,0 +1,22 @@
+# Java / Maven
+target/
+*.class
+*.jar
+.idea/
+*.iml
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*secret*.tfvars
+# NOTE: .terraform.lock.hcl COMMIT cheyyali
+
+# Helm
+helm/**/charts/*.tgz
+
+# Env / secrets
+.env
+*.pem
+*.pfx
