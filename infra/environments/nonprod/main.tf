@@ -20,3 +20,15 @@ module "network" {
 
   tags = local.tags
 }
+
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  name_suffix         = local.name_suffix
+  resource_group_name = azurerm_resource_group.main.name
+  location            = var.location
+  retention_in_days   = 30
+  daily_quota_gb      = 0.5
+
+  tags = local.tags
+}
