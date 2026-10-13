@@ -1,0 +1,108 @@
+name: terraform-nonprod
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/environments/nonprod/**"
+      - "infra/modules/**"
+      - ".github/workflows/terraform-nonprod.yml"
+  push:
+    branches: [main]
+    paths:
+      - "infra/environments/nonprod/**"
+      - "infra/modules/**"
+      - ".github/workflows/terraform-nonprod.yml"
+
+permissions:
+  id-token: write       # OIDC fingerprint kosam
+  contents: read
+  pull-requests: write  # PR lo plan comment kosam
+
+concurrency:
+  group: terraform-nonprod
+  cancel-in-progress: false
+
+env:
+  ARM_USE_OIDC: "true"
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  # ---------- PR: plan chupinchu (intern robot 👀) ----------
+  plan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PLAN }}
+    defaults:
+      run:
+        working-directory: infra/environments/nonprod
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.5
+          terraform_wrapper: false
+
+      - name: Format check
+        run: terraform fmt -check -recursive ../../
+
+      - name: Init
+        run: terraform init -input=false
+
+      - name: Validate
+        run: terraform validate
+
+      - name: Plan
+        run: |
+          terraform plan -input=false -no-color -out tfplan
+          terraform show -no-color tfplan > plan.txt
+
+      - name: Comment plan on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SUMMARY=$(grep -E "^Plan:|No changes" plan.txt | head -1)
+          {
+            echo "### 🤖 Terraform plan: nonprod"
+            echo ""
+            echo "**${SUMMARY}**"
+            echo ""
+            echo "<details><summary>Full plan chudandi</summary>"
+            echo ""
+            echo '```'
+            head -c 60000 plan.txt
+            echo '```'
+            echo "</details>"
+          } > comment.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file comment.md
+
+  # ---------- Merge: apply (manager robot 🔨) ----------
+  apply:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: nonprod
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_APPLY }}
+    defaults:
+      run:
+        working-directory: infra/environments/nonprod
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.5
+          terraform_wrapper: false
+
+      - name: Init
+        run: terraform init -input=false
+
+      - name: Plan
+        run: terraform plan -input=false -no-color -out tfplan
+
+      - name: Apply
+        run: terraform apply -input=false -auto-approve tfplan

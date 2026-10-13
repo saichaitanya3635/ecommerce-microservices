@@ -33,8 +33,6 @@ module "monitoring" {
   tags = local.tags
 }
 
-data "azurerm_client_config" "current" {}
-
 module "keyvault" {
   source = "../../modules/keyvault"
 
@@ -43,7 +41,7 @@ module "keyvault" {
   location                   = var.location
   soft_delete_retention_days = 7
   purge_protection_enabled   = false
-  admin_principal_ids        = [data.azurerm_client_config.current.object_id]
+  admin_principal_ids        = var.kv_admin_object_ids
   log_analytics_workspace_id = module.monitoring.workspace_id
 
   tags = local.tags
