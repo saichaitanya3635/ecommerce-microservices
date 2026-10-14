@@ -33,7 +33,7 @@ jobs:
   # ---------- PR: plan chupinchu (intern robot 👀) ----------
   plan:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PLAN }}
     defaults:
@@ -83,7 +83,7 @@ jobs:
   # ---------- Merge: apply (manager robot 🔨) ----------
   apply:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: nonprod
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_APPLY }}

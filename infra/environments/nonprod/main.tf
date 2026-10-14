@@ -58,3 +58,22 @@ module "acr" {
 
   tags = local.tags
 }
+
+module "aks" {
+  source = "../../modules/aks"
+  count  = var.enable_aks ? 1 : 0
+
+  name_suffix                = local.name_suffix
+  resource_group_name        = azurerm_resource_group.main.name
+  location                   = var.location
+  subnet_id                  = module.network.subnet_ids.aks
+  log_analytics_workspace_id = module.monitoring.workspace_id
+  attach_acr                 = var.enable_acr
+  acr_id                     = var.enable_acr ? module.acr[0].id : null
+  admin_object_ids           = var.kv_admin_object_ids
+  system_vm_size             = "Standard_B2s"
+  apps_vm_size               = "Standard_B2ms"
+  apps_node_count            = 1
+
+  tags = local.tags
+}

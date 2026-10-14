@@ -8,5 +8,5 @@ kv_admin_object_ids = [
 
 # ---------- Cost switches (true = ON, false = OFF) ----------
 enable_acr      = true
-enable_aks      = false
+enable_aks      = true
 enable_postgres = false
