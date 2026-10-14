@@ -24,7 +24,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   node_resource_group = "rg-${var.name_suffix}-aks-nodes"
   kubernetes_version  = var.kubernetes_version
   sku_tier            = "Free"
-  
+
   node_provisioning_profile {
     mode = "Manual"
   }
