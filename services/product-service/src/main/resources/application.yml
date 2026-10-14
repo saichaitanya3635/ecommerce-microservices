@@ -1,0 +1,26 @@
+server:
+  port: 8080
+  shutdown: graceful            # Pod stop ayinappudu running requests complete chesi aagu
+
+spring:
+  application:
+    name: product-service
+  datasource:
+    # ${VARIABLE:default} → env variable unte adi, lekapothe default (local kosam)
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/products}
+    username: ${DB_USER:product}
+    password: ${DB_PASSWORD:product}
+  jpa:
+    hibernate:
+      ddl-auto: update          # Table automatic ga create (tarvata Flyway ki marustam)
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true           # Kubernetes kosam /actuator/health/liveness, /readiness
