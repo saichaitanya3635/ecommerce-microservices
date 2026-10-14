@@ -69,6 +69,7 @@ locals {
     plan_reader       = { who = "plan", role = "Reader", scope = data.azurerm_resource_group.nonprod.id }
     plan_kv_reader    = { who = "plan", role = "Key Vault Reader", scope = data.azurerm_resource_group.nonprod.id }
     plan_state        = { who = "plan", role = "Storage Blob Data Contributor", scope = data.azurerm_storage_account.tfstate.id }
+    plan_aks_user     = { who = "plan", role = "Azure Kubernetes Service Cluster User Role", scope = data.azurerm_resource_group.nonprod.id }
     apply_contributor = { who = "apply", role = "Contributor", scope = data.azurerm_resource_group.nonprod.id }
     apply_rbac_admin  = { who = "apply", role = "Role Based Access Control Administrator", scope = data.azurerm_resource_group.nonprod.id }
     apply_kv_reader   = { who = "apply", role = "Key Vault Reader", scope = data.azurerm_resource_group.nonprod.id }
